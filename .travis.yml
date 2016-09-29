@@ -1,0 +1,28 @@
+# File managed by pluginsync
+sudo: false
+language: go
+go:
+- 1.6.3
+- 1.7.1
+env:
+  global:
+  - ORG_PATH=/home/travis/gopath/src/github.com/intelsdi-x
+  - SNAP_PLUGIN_SOURCE=/home/travis/gopath/src/github.com/${TRAVIS_REPO_SLUG}
+  matrix:
+  - TEST_TYPE=small
+  - TEST_TYPE=build
+matrix:
+  exclude:
+  - go: 1.6.3
+    env: TEST_TYPE=build
+before_install:
+- "[[ -d $SNAP_PLUGIN_SOURCE ]] || mkdir -p $ORG_PATH && ln -s $TRAVIS_BUILD_DIR $SNAP_PLUGIN_SOURCE"
+install:
+- cd $SNAP_PLUGIN_SOURCE
+- make deps
+script:
+- make check 2>&1
+notifications:
+  email: false
+  slack:
+    secure: VkbZLIc2RH8yf3PtIAxUNPdAu3rQQ7yQx0GcK124JhbEnZGaHyK615V0rbG7HcVmYKGPdB0cXqZiLBDKGqGKb2zR1NepOe1nF03jxGSpPq8jIFeEXSJGEYGL34ScDzZZGuG6qwbjFcXiW5lqn6t8igzp7v2+URYBaZo5ktCS2xY=
