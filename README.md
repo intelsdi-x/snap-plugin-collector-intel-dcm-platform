@@ -28,7 +28,7 @@
  - Ipmitool needs to be installed on platform
 
 ### Installation
-#### Download Intel Node Manager plugin binary:
+#### Download Intel OPEN DCM Platform plugin binary:
 You can get the pre-built binaries for your OS and architecture at snap's [Github Releases](https://github.com/intelsdi-x/snap/releases) page.
 
 #### To build the plugin binary:
@@ -71,7 +71,7 @@ Sample configuration of intel dcm platform plugin:
                 "intel-dcm-platform": {
                     "all": {
                         "protocol": "node_manager",
-			"mode": "legacy_inband",
+			            "mode": "legacy_inband",
                         "channel": "0x06",
                         "slave": "0x2C"
                     }
@@ -127,11 +127,11 @@ Namespace | Data Type | Description (optional)
 /intel/dcm/inventory/product_manufacturer | string | Product Manufacturer name queried from FRU
 /intel/dcm/inventory/product_name | string | Product Name queried from FRU
 /intel/dcm/inventory/product_serial | string | Product Serial number queried from FRU
-/intel/dcm/health/processor | string | ¡°OK¡± for good state and other message for corresponding processor error
-/intel/dcm/health/memory | string | ¡°OK¡± for good state and other message for corresponding memory error
-/intel/dcm/health/fan | string | ¡°OK¡± for good state and other message for corresponding fan error
-/intel/dcm/health/powersupply | string | ¡°OK¡± for good state and other message for corresponding power supply error
-/intel/dcm/health/driverslot | string | ¡°OK¡± for good state and other message for corresponding driver error
+/intel/dcm/health/processor | string | "OK" for good state and other message for corresponding processor error
+/intel/dcm/health/memory | string | "OK" for good state and other message for corresponding memory error
+/intel/dcm/health/fan | string | "OK" for good state and other message for corresponding fan error
+/intel/dcm/health/powersupply | string | "OK" for good state and other message for corresponding power supply error
+/intel/dcm/health/driverslot | string | "OK" for good state and other message for corresponding driver error
 
 ### Metric Tags
 Namespace | Tag | Description
@@ -139,7 +139,7 @@ Namespace | Tag | Description
 /intel/dcm/* | source | Host IP address
 
 ### Examples
-Example task manifest to use Intel Node Manager plugin:
+Example task manifest to use Intel OPEN DCM Platform plugin:
 ```
 {
     "version": 1,
@@ -153,14 +153,14 @@ Example task manifest to use Intel Node Manager plugin:
                 "/intel/dcm/power/system/avg": {},
                 "/intel/dcm/power/system/max": {},
                 "/intel/dcm/power/system/min": {},
-		"/intel/dcm/inventory/product_name ": {},
-		"/intel/dcm/inventory/product_manufacturer ":{},
-		"/intel/dcm/inventory/firmware_version":{},
-		"/intel/dcm/health/powersupply":{},
-		"/intel/dcm/health/fan":{},
-		"/intel/dcm/health/processor":{},
-		"/intel/dcm/thermal/inlet/cur":{},
-		"/intel/dcm/thermal/inlet/max":{},
+		        "/intel/dcm/inventory/product_name ": {},
+		        "/intel/dcm/inventory/product_manufacturer ":{},
+		        "/intel/dcm/inventory/firmware_version":{},
+		        "/intel/dcm/health/powersupply":{},
+		        "/intel/dcm/health/fan":{},
+		        "/intel/dcm/health/processor":{},
+		        "/intel/dcm/thermal/inlet/cur":{},
+		        "/intel/dcm/thermal/inlet/max":{},
             },
             "config": {
             },
