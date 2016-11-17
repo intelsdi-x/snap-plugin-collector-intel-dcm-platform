@@ -2,6 +2,7 @@ package ipmi
 
 import (
 	"fmt"
+	log "github.com/Sirupsen/logrus"
 )
 
 type SdrParser struct {
@@ -116,13 +117,18 @@ var SensorTypeComponentMap = map[uint16]ComponentDescription{
 	41:ComponentDescription{"BATTERY_HEALTH","health/battery"}}
 
 func (sp *SdrParser) GetComponentHealth(host string)(map[string]string,error){
-	fmt.Println("Enter GetComponentHealth")
+	log.WithFields(log.Fields{
+			"host": host,
+		}).Debug("GetComponentHealth")
 	ret := map[string]string{}
 	deviceId,err := sp.GetDeviceId(host)
 	if err != nil{
 		return nil,err
 	}
-
+	log.WithFields(log.Fields{
+			"host": host,
+			"DeviceId": deviceId,
+		}).Debug("GetComponentHealth getDeviceId")
 	sdrInfos,err := sp.ScanSdr(deviceId.IsDeviceSdr,host)
 	if err != nil{
 		return nil,err

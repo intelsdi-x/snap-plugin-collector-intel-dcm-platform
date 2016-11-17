@@ -48,12 +48,16 @@ func ExecIpmiToolLocal(request []byte, strct *LinuxInBandIpmitool, isBridged boo
 	for i := range request {
 		stringRequest = append(stringRequest, fmt.Sprintf("0x%02x", request[i]))
 	}
-
+	
 	ret, err := exec.Command(c, stringRequest...).CombinedOutput()
 	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Debug("ExecIpmiToolLocal")
 		log.Debug("Unable to run ipmitool")
 		return nil
 	}
+	
 	returnStrings := strings.Split(string(ret), " ")
 	rets := make([]byte, len(returnStrings))
 	for i, element := range returnStrings {
@@ -68,6 +72,9 @@ func ExecIpmiToolLocal(request []byte, strct *LinuxInBandIpmitool, isBridged boo
 func ExecIpmiToolRemote(request []byte, strct *LinuxOutOfBand, addr string, isBridged bool) []byte {
 	c, err := exec.LookPath("ipmitool")
 	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Debug("ExecIpmiToolRemote")
 		log.Debug("Unable to find ipmitool")
 		return nil
 	}
@@ -84,6 +91,11 @@ func ExecIpmiToolRemote(request []byte, strct *LinuxOutOfBand, addr string, isBr
 
 	ret, err := exec.Command(c, a...).CombinedOutput()
 	if err != nil {
+		log.WithFields(log.Fields{
+			"c":     c,
+			"a":     a,
+			"error": err,
+		}).Debug("ExecIpmiToolRemote")
 		log.Debug("Unable to run ipmitool")
 		return nil
 	}

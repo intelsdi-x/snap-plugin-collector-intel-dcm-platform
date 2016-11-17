@@ -26,6 +26,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	log "github.com/Sirupsen/logrus"
 	"github.com/intelsdi-x/snap-plugin-collector-intel-dcm-platform/ipmi"
 	"github.com/intelsdi-x/snap/control/plugin"
 	"github.com/intelsdi-x/snap/control/plugin/cpolicy"
@@ -74,6 +75,15 @@ type IpmiCollector struct {
 	NSim        int
 	Inventory   map[string]map[string]string
 	ComponentHealth      map[string]map[string]string
+}
+func init() {
+	f, err := os.OpenFile("/tmp/intel-dcm-platform-collector.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	if err != nil {
+		fmt.Printf("error opening file: %v", err)
+	}
+	log.SetOutput(f)
+	log.SetLevel(log.DebugLevel)
+	log.Debug("Logger init successfully")
 }
 
 // CollectMetrics Performs metric collection.
@@ -156,6 +166,13 @@ func (ic *IpmiCollector) CollectMetrics(mts []plugin.MetricType) ([]plugin.Metri
 
 // GetMetricTypes Returns list of metrics available for current vendor.
 func (ic *IpmiCollector) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricType, error) {
+	log.Debug("Enter fun GetMetricTypes")
+	var config = cfg.Table()
+	log.Debug("get Config fun GetMetricTypes")
+	log.WithFields(log.Fields{
+		"mode": config["mode"].(ctypes.ConfigValueStr).Value,
+		"host": config["host"].(ctypes.ConfigValueStr).Value,
+	}).Debug("GetMetricTypes")
 	ic.construct(cfg.Table())
 	var mts []plugin.MetricType
 	mts = make([]plugin.MetricType, 0)
