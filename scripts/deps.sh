@@ -24,6 +24,7 @@ set -o pipefail
 
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __proj_dir="$(dirname "$__dir")"
+_dep=""
 
 # shellcheck source=scripts/common.sh
 . "${__dir}/common.sh"
@@ -32,6 +33,10 @@ detect_go_dep() {
   [[ -f "${__proj_dir}/Godeps/Godeps.json" ]] && _dep='godep'
   [[ -f "${__proj_dir}/glide.yaml" ]] && _dep='glide'
   [[ -f "${__proj_dir}/vendor/vendor.json" ]] && _dep='govendor'
+  if [ -z "${_dep}" ]; then
+    _error "no golang dependency tool detected"
+    exit 1
+  fi
   _info "golang dependency tool: ${_dep}"
   echo "${_dep}"
 }
