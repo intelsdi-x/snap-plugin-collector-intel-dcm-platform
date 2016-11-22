@@ -170,8 +170,7 @@ func (ic *IpmiCollector) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricT
 	var config = cfg.Table()
 	log.Debug("get Config fun GetMetricTypes")
 	log.WithFields(log.Fields{
-		"mode": config["mode"].(ctypes.ConfigValueStr).Value,
-		"host": config["host"].(ctypes.ConfigValueStr).Value,
+		"mode": config["mode"].(ctypes.ConfigValueStr).Value,		
 	}).Debug("GetMetricTypes")
 	ic.construct(cfg.Table())
 	var mts []plugin.MetricType
