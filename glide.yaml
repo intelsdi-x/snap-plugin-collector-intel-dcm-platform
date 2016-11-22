@@ -1,0 +1,16 @@
+package: github.com/intelsdi-x/snap-plugin-collector-intel-dcm-platform
+import:
+- package: github.com/Sirupsen/logrus
+  version: ^0.11.0
+- package: github.com/intelsdi-x/snap
+  version: ^0.18.0
+  subpackages:
+  - control/plugin
+  - control/plugin/cpolicy
+  - core
+  - core/ctypes
+testImport:
+- package: github.com/smartystreets/goconvey
+  version: ^1.6.2
+  subpackages:
+  - convey
