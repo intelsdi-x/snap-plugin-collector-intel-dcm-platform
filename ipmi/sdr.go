@@ -117,18 +117,11 @@ var SensorTypeComponentMap = map[uint16]ComponentDescription{
 	41:ComponentDescription{"BATTERY_HEALTH","health/battery"}}
 
 func (sp *SdrParser) GetComponentHealth(host string)(map[string]string,error){
-	log.WithFields(log.Fields{
-			"host": host,
-		}).Debug("GetComponentHealth")
 	ret := map[string]string{}
 	deviceId,err := sp.GetDeviceId(host)
 	if err != nil{
 		return nil,err
 	}
-	log.WithFields(log.Fields{
-			"host": host,
-			"DeviceId": deviceId,
-		}).Debug("GetComponentHealth getDeviceId")
 	sdrInfos,err := sp.ScanSdr(deviceId.IsDeviceSdr,host)
 	if err != nil{
 		return nil,err
@@ -173,6 +166,9 @@ func (sp *SdrParser) GetDeviceId(host string) (*DeviceId, error) {
 	var deviceId DeviceId
 	response, err := sp.IpmiLayer.ExecRaw(CmdGetDeviceId, host)
 	if err != nil {
+	    log.WithFields(log.Fields{
+			"error": err,
+		}).Debug("GetDeviceId error")		
 		return nil, err
 	}
 	if len(response.Data) < 1{
@@ -218,7 +214,7 @@ func (sp *SdrParser) ReserveSdr(isDeviceSdr bool,host string) ([]byte,error) {
         cmd = CmdReserveStorageSdr
     }else {
         cmd = CmdReserveDeviceSdr
-    }
+    }	
 	response, err := sp.IpmiLayer.ExecRaw(cmd, host)
 	if (err != nil){
 		return nil, err
@@ -241,7 +237,7 @@ func (sp *SdrParser) GetSdrRepositoryAllocationInfo(host string) (uint16, error)
 	}
     var data = response.Data[1:]
 	if len(data) != 9 {			
-			return uint16(0),fmt.Errorf("Additional data result unexpected!");
+		return uint16(0),fmt.Errorf("Additional data result unexpected!");
 	}
 	var allocationUnitSize = uint16(data[3])<< 8+ uint16(data[2])
 	var sdrMaxReadLen uint16= 16
@@ -295,22 +291,42 @@ func (sp *SdrParser) GetSensorReading(sensorNum int,host string)([]byte,error){
 
 func (sp *SdrParser) ScanSdr(isDeviceSdr bool,host string) ([]SdrInfo, error){
 	err := sp.GetSdrInfo(isDeviceSdr,host)
-	if (err != nil){
+	if (err != nil){		
 		return nil,err
 	}
 	reservationId,err := sp.ReserveSdr(isDeviceSdr,host)
 	if err != nil{
+		log.WithFields(log.Fields{
+				"host": host,
+				"isDeviceSdr":isDeviceSdr,
+				"error":err,
+		}).Debug("ScanSdr ReserveSdr exit with error")			
 		return nil,err
 	}
+/*	log.WithFields(log.Fields{
+			"host": host,
+			"isDeviceSdr":isDeviceSdr,
+			"reservationId":reservationId,
+		}).Debug("ScanSdr reservationId")	*/
 	var sdrMaxReadLen = uint16(16)
 	if !isDeviceSdr {
 		sdrMaxRead,err := sp.GetSdrRepositoryAllocationInfo(host)
 		if (err != nil){
+			log.WithFields(log.Fields{
+					"host": host,
+					"isDeviceSdr":isDeviceSdr,
+					"error":err,
+			}).Debug("ScanSdr GetSdrRepositoryAllocationInfo exit with error")				
 			return nil,err
 		}
 		sdrMaxReadLen = sdrMaxRead
 	}	
-	
+/*	log.WithFields(log.Fields{
+			"reservationId":reservationId,
+			"host": host,
+			"isDeviceSdr":isDeviceSdr,
+			"sdrMaxRead":sdrMaxReadLen,
+		}).Debug("ScanSdr sdrMaxRead")		*/
 	return sp.ScanSdrLoop(reservationId,0,sdrMaxReadLen,isDeviceSdr,host)
 }
 
@@ -318,13 +334,30 @@ func (sp *SdrParser) ScanSdr(isDeviceSdr bool,host string) ([]SdrInfo, error){
 func (sp *SdrParser) ScanSdrLoop(reservationId []byte,recordId uint16,sdrMaxReadLen uint16,isDeviceSdr bool,host string) ([]SdrInfo, error){
 	var recId  = recordId
 	var sdrSet []SdrInfo = []SdrInfo{}
-
+	log.WithFields(log.Fields{
+		"host": host,
+		"isDeviceSdr":isDeviceSdr,
+		"reservationId":reservationId,
+		"recordId":recordId,
+		"sdrMaxReadLen":sdrMaxReadLen,
+		}).Debug("ScanSdrLoop")
 	for {
 		//reservationId []byte，recordId int,isDeviceSdr bool,host string
 		  sdrHeader,err:=sp.GetSdrHeader(reservationId,recId,isDeviceSdr,host)
-		  if err !=nil{
+		  if err !=nil{	
 			  return nil,err
 		  }
+/*		 log.WithFields(log.Fields{
+			"host": host,
+			"isDeviceSdr":isDeviceSdr,
+			"reservationId":reservationId,
+			"recordId":recordId,
+			"sdrMaxReadLen":sdrMaxReadLen,
+			"sdrHeader.NextRecordId":sdrHeader.NextRecordId,		
+			"sdrHeader.RecordType":sdrHeader.RecordType,
+			"sdrHeader.RecordId":sdrHeader.RecordId,
+			"sdrHeader.RecordLength":sdrHeader.RecordLength,
+			}).Debug("ScanSdrLoop GetSdrHeader ")	*/		  
 		  var recordType  = sdrHeader.RecordType
 		  if (recordId == 0 || sdrHeader.RecordId == recordId )&& 
 			  //IpmiConstants.SDR_TYPE_FUL,IpmiConstants.SDR_TYPE_COMPACT
@@ -333,6 +366,20 @@ func (sp *SdrParser) ScanSdrLoop(reservationId []byte,recordId uint16,sdrMaxRead
 				if err !=nil{
 					return nil,err
 				}
+/*				log.WithFields(log.Fields{
+					"host": host,
+					"isDeviceSdr":isDeviceSdr,
+					"reservationId":reservationId,
+					"recordId":recordId,
+					"sdrMaxReadLen":sdrMaxReadLen,
+					"sdr.Header.NextRecordId":sdr.Header.NextRecordId,		
+					"sdr.Header.RecordType":sdr.Header.RecordType,
+					"sdr.Header.RecordId":sdr.Header.RecordId,
+					"sdr.Header.RecordLength":sdr.Header.RecordLength,
+					"sdr.EventReadingType":sdr.EventReadingType,
+					"sdr.SensorNumber":sdr.SensorNumber,
+					"sdr.SensorType":sdr.SensorType,
+				}).Debug("ScanSdrLoop GetSdrByHeader ")	*/				
 				recordType = sdr.Header.RecordType
 				if recordType == uint16 (0x01) || recordType == uint16 (0x02) {
 					sdrSet = append(sdrSet,sdr)
@@ -347,30 +394,38 @@ func (sp *SdrParser) ScanSdrLoop(reservationId []byte,recordId uint16,sdrMaxRead
 }
 
 func(sp * SdrParser) GetSdrBytes(reservationId []byte, recordId uint16,totalBytesToRead uint16, sdrMaxReadLen uint16,isDeviceSdr bool,host string)([]byte, error){
-	var data []byte
+	var data []byte = make([]byte, totalBytesToRead + uint16(2))
 	var bytesLeftToRead = totalBytesToRead
-	var currentBytesToRead uint16= 0
-	for bytesRead := uint16(0);  bytesRead < bytesLeftToRead; bytesRead += currentBytesToRead {	
+	var currentBytesToRead uint16= 0	
+	for bytesRead := uint16(0);  bytesRead < bytesLeftToRead; bytesRead += currentBytesToRead {					
 		bytesLeftToRead = uint16 (totalBytesToRead - bytesRead)
 		if (bytesLeftToRead > sdrMaxReadLen) {
 			currentBytesToRead = sdrMaxReadLen;
 		} else {
 			currentBytesToRead = bytesLeftToRead;
-	    }
+	    }			
 		var currentSdr []byte
 		currentSdr,err := sp.GetSdr(reservationId,recordId,bytesRead,currentBytesToRead,isDeviceSdr,host)
 		if err !=nil{
 			return nil,err
-		}
-		data := make([]byte, totalBytesToRead)
+		}		
 		// First copy the next-record-id data
 		data[0] = currentSdr[0];
-		data[1] = currentSdr[1];
+		data[1] = currentSdr[1];	
 		// Then the rest of the data
 		for i := uint16(0);i < currentBytesToRead; i++ {
-			data[uint16(2) + bytesRead + i] = currentSdr[uint16(2) + i]
-		}
+			data[uint16(2) + bytesRead + i] = currentSdr[uint16(2) + i]		
+		}		
 	} 
+/*	log.WithFields(log.Fields{
+		"reservationId": reservationId,
+		"recordId":recordId,
+		"totalBytesToRead":totalBytesToRead,
+		"sdrMaxReadLen":sdrMaxReadLen,
+		"isDeviceSdr":isDeviceSdr,
+		"host":host,
+		"data":data,
+	}).Debug("GetSdrBytes ")	*/
 	return data,nil
 }
 
@@ -407,9 +462,9 @@ func (sp *SdrParser) GetSdrByHeader(reservationId []byte,header *SdrHeader,sdrMa
 
 	//SDR_TYPE_FULL,SDR_TYPE_COMPACT
 	if sdrInfo.Header.RecordType == uint16 (0x01) ||sdrInfo.Header.RecordType == uint16(0x02){
-		sdrInfo.SensorNumber = uint16 (sdrBytes[8]) 
-		sdrInfo.SensorType = uint16 (sdrBytes[13]) 
-		sdrInfo.EventReadingType = uint16 (sdrBytes[14]) 		
+		sdrInfo.SensorNumber = uint16 (sdrBytes[9]) 
+		sdrInfo.SensorType = uint16 (sdrBytes[14]) 
+		sdrInfo.EventReadingType = uint16 (sdrBytes[15]) 		
 	}else {
 		return sdrInfo,fmt.Errorf("Unexpected RecordType")
 	}
