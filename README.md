@@ -1,3 +1,7 @@
+# This Plugin is in Alpha.
+
+It is being worked on in the open in an effort to replace the [node manager](https://github.com/intelsdi-x/snap-plugin-collector-node-manager) plugin. Please report any bugs by creating an [issue](https://github.com/intelsdi-x/snap-plugin-collector-intel-dcm-platform/issues/new).
+
 # snap collector plugin - Intel OPEN DCM Platform Collector
 
  Plugin to collect inventory, health, power/thermal related metrics from platforms which expose such data through Intel Node Manager, DCMI or generic IPMI interfaces.
