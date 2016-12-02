@@ -200,8 +200,8 @@ There's more than one way to give back, from examples to blogs to code updates. 
 
 ## Acknowledgements
 
-* Author: [Lukasz Mroz](https://github.com/lmroz)
-* Author: [Marcin Krolik](https://github.com/marcin-krolik)
-* Author: [Patryk Matyjasek](https://github.com/PatrykMatyjasek)
+* Author: [Dancy Ding](https://github.com/dancyding)
+* Author: [Xin Dong](https://github.com/xindongIntel)
+* Author: [Jialei Wang](https://github.com/WangJialei-A )
 
 And **thank you!** Your contribution, through code and participation, is incredibly important to us.
