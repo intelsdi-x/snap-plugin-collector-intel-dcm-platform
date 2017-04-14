@@ -36,7 +36,7 @@ It is being worked on in the open in an effort to replace the [node manager](htt
 You can get the pre-built binaries for your OS and architecture at snap's [Github Releases](https://github.com/intelsdi-x/snap/releases) page.
 
 #### To build the plugin binary:
-Fork https://github.com/intelsdi-x/snap-plugin-collector-intel-dcm-platform
+Fork https://github.com/intelsdi-x/snap-plugin-collector-intel-dcm-platform  
 Clone repo into `$GOPATH/src/github/intelsdi-x/`:
 ```
 $ git clone https://github.com/<yourGithubID>/snap-plugin-collector-intel-dcm-platform
@@ -70,12 +70,12 @@ Sample configuration of intel dcm platform plugin:
 ```
 {
     "control" : {
-	"plugins": {
+        "plugins": {
             "collector": {
                 "intel-dcm-platform": {
                     "all": {
                         "protocol": "node_manager",
-			            "mode": "legacy_inband",
+                        "mode": "legacy_inband",
                         "channel": "0x06",
                         "slave": "0x2C"
                     }
@@ -91,7 +91,7 @@ Sample configuration of intel dcm platform plugin:
 ### Collected Metrics
 This plugin has the ability to gather the following metrics:
 
-Namespace | Data Type | Description (optional)
+Namespace | Data Type | Description
 ----------|-----------|-----------------------
 /intel/dcm/airflow/cur | uint16 | Current Volumetric Airflow
 /intel/dcm/airflow/avg | uint16 | Average Volumetric Airflow 
@@ -143,7 +143,22 @@ Namespace | Tag | Description
 /intel/dcm/* | source | Host IP address
 
 ### Examples
-Example task manifest to use Intel OPEN DCM Platform plugin:
+In one terminal window, open the Snap daemon with path to config file (see [examplary config file](examples/configs/)). In this case with logging set to 1 and trust disabled:
+```
+$ snapteld -l 1 -t 0 --config config.json
+```
+
+Load snap-plugin-collector-intel-dcm-platform plugin:
+```
+$ snaptel plugin load snap-plugin-collector-intel-dcm-platform
+```
+
+See available metrics for your system:
+```
+$ snaptel metric list
+```
+
+Create task manifest to use Intel OPEN DCM Platform plugin (or use an [examplary task manifest](examples/tasks/)):
 ```
 {
     "version": 1,
@@ -157,14 +172,14 @@ Example task manifest to use Intel OPEN DCM Platform plugin:
                 "/intel/dcm/power/system/avg": {},
                 "/intel/dcm/power/system/max": {},
                 "/intel/dcm/power/system/min": {},
-		        "/intel/dcm/inventory/product_name ": {},
-		        "/intel/dcm/inventory/product_manufacturer ":{},
-		        "/intel/dcm/inventory/firmware_version":{},
-		        "/intel/dcm/health/powersupply":{},
-		        "/intel/dcm/health/fan":{},
-		        "/intel/dcm/health/processor":{},
-		        "/intel/dcm/thermal/inlet/cur":{},
-		        "/intel/dcm/thermal/inlet/max":{},
+	        "/intel/dcm/inventory/product_name ": {},
+	        "/intel/dcm/inventory/product_manufacturer ":{},
+	        "/intel/dcm/inventory/firmware_version":{},
+	        "/intel/dcm/health/powersupply":{},
+	        "/intel/dcm/health/fan":{},
+	        "/intel/dcm/health/processor":{},
+	        "/intel/dcm/thermal/inlet/cur":{},
+	        "/intel/dcm/thermal/inlet/max":{},
             },
             "config": {
             },
@@ -184,6 +199,32 @@ Example task manifest to use Intel OPEN DCM Platform plugin:
 
 ```
 
+Get file plugin for publishing and load it:
+```
+$ wget  http://snap.ci.snap-telemetry.io/plugins/snap-plugin-publisher-file/latest/linux/x86_64/snap-plugin-publisher-file
+$ snaptel plugin load snap-plugin-publisher-file
+```
+
+Create a task:
+```
+$ snaptel task create -t dcm-file.json
+Using task manifest to create task
+Task created
+ID: 02dd7ff4-8106-47e9-8b86-70067cd0a850
+Name: Task-02dd7ff4-8106-47e9-8b86-70067cd0a850
+State: Running
+```
+See realtime output from `snaptel task watch <task_id>` (CTRL+C to exit)
+```
+snaptel task watch 02dd7ff4-8106-47e9-8b86-70067cd0a850
+
+Watching Task (02dd7ff4-8106-47e9-8b86-70067cd0a850):
+NAMESPACE                        DATA    TIMESTAMP
+/intel/dcm/power/cpu/avg         44      2017-04-14 12:18:39.31235067 +0000 UTC
+/intel/dcm/power/memory/avg      18      2017-04-14 12:18:39.31235067 +0000 UTC
+/intel/dcm/power/system/avg      129     2017-04-14 12:18:39.31235067 +0000 UTC
+/intel/dcm/thermal/inlet/avg     26      2017-04-14 12:18:39.31235067 +0000 UTC
+```
 
 ### Roadmap
 As we launch this plugin, we have a few items in mind for the next release:
@@ -200,7 +241,7 @@ We love contributions!
 There's more than one way to give back, from examples to blogs to code updates. See our recommended process in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
-[snap](http://github.com:intelsdi-x/snap), along with this plugin, is an Open Source software released under the Apache 2.0 [License](LICENSE).
+[snap](http://github.com/intelsdi-x/snap), along with this plugin, is an Open Source software released under the Apache 2.0 [License](LICENSE).
 
 ## Acknowledgements
 

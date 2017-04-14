@@ -1,0 +1,16 @@
+{
+  "control": {
+    "plugins": {
+      "collector": {
+        "intel-dcm-platform": {
+          "all": {
+            "protocol": "node_manager",
+            "mode": "legacy_inband",
+            "channel": "0x06",
+            "slave": "0x2C"
+          }
+        }
+      }
+    }
+  }
+}

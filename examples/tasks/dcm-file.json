@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "schedule": {
+    "type": "simple",
+    "interval": "10s"
+  },
+  "deadline": "20s",
+  "workflow": {
+    "collect": {
+      "metrics": {
+        "/intel/dcm/power/system/avg": {},
+        "/intel/dcm/power/memory/avg": {},
+        "/intel/dcm/power/cpu/avg": {},
+        "/intel/dcm/thermal/inlet/avg": {}
+      },
+      "publish": [
+        {
+          "plugin_name": "file",
+          "config": {
+            "file": "/tmp/published_dcm"
+          }
+        }
+      ]
+    }
+  }
+}
