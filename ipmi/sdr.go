@@ -59,6 +59,8 @@ var CmdReserveDeviceSdr = IpmiRequest{[]byte{0x4, 0x22}, 0x0, 0x0}
 
 var CmdGetSdrRepositoryAllocationInfo = IpmiRequest{[]byte{0xa, 0x21}, 0x0, 0x0}
 
+var sdrInfos []SdrInfo
+
 //AddData byte[6]: 
 //byte[0] =reservationId[0]
 //byte[1] = reservationId[1]
@@ -122,11 +124,13 @@ func (sp *SdrParser) GetComponentHealth(host string)(map[string]string,error){
 	if err != nil{
 		return nil,err
 	}
-	sdrInfos,err := sp.ScanSdr(deviceId.IsDeviceSdr,host)
-	if err != nil{
-		return nil,err
+    if sdrInfos == nil {
+        var err error
+        sdrInfos,err = sp.ScanSdr(deviceId.IsDeviceSdr,host)
+        if err != nil{
+	        return nil,err
+        }
 	}
-
 	sdrStatus,err := sp.GetSdrData(sdrInfos,host)
 	if err != nil{
 		return nil,err
@@ -476,7 +480,7 @@ func (sp *SdrParser) GetSdrData(sdrs []SdrInfo,host string) ([]SensorStatus, err
 	sensorStatus = make([]SensorStatus,len(sdrs))
 	var cmd = CmdGetSensorReading.Clone()
 	for i,sdr := range sdrs{
-		cmd.Data[3] = byte(sdr.SensorNumber)
+		cmd.Data[2] = byte(sdr.SensorNumber)
 		response, err := sp.IpmiLayer.ExecRaw(cmd, host)
 		if err != nil{
 			return nil,err
