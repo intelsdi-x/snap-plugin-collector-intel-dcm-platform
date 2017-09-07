@@ -35,7 +35,7 @@ go_build=(go build -ldflags "-w")
 _info "project path: ${__proj_dir}"
 _info "plugin name: ${plugin_name}"
 
-export CGO_ENABLED=0
+export CGO_ENABLED=1
 
 # rebuild binaries:
 _debug "removing: ${build_dir:?}/*"
