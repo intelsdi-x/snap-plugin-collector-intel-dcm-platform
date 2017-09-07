@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # File managed by pluginsync
 
 # http://www.apache.org/licenses/LICENSE-2.0.txt
@@ -35,7 +35,7 @@ go_build=(go build -ldflags "-w")
 _info "project path: ${__proj_dir}"
 _info "plugin name: ${plugin_name}"
 
-export CGO_ENABLED=1
+export CGO_ENABLED=0
 
 # rebuild binaries:
 _debug "removing: ${build_dir:?}/*"
