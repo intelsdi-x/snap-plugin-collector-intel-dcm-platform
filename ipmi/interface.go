@@ -70,12 +70,12 @@ type InventoryInfo struct {
 	BMCMac          string
 }
 
-func (req *IpmiRequest ) Clone()(clonedReq IpmiRequest){
+func (req *IpmiRequest) Clone() (clonedReq IpmiRequest) {
 	var cReq IpmiRequest
-	var clonedData = make([]byte,len(req.Data))
-	copy(clonedData,req.Data)
+	var clonedData = make([]byte, len(req.Data))
+	copy(clonedData, req.Data)
 	cReq.Data = clonedData
 	cReq.Channel = req.Channel
-	cReq.Slave = req.Slave 
+	cReq.Slave = req.Slave
 	return cReq
 }
