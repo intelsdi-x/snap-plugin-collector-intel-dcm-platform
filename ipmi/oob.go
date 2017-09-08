@@ -23,6 +23,7 @@ package ipmi
 
 import (
 	log "github.com/Sirupsen/logrus"
+
 	"sync"
 	"time"
 )

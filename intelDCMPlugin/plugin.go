@@ -26,6 +26,7 @@ import (
 	"os"
 	"strings"
 	"time"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/intelsdi-x/snap-plugin-collector-intel-dcm-platform/ipmi"
 	"github.com/intelsdi-x/snap/control/plugin"
@@ -67,15 +68,16 @@ func extendPath(path, ext string) string {
 // RAW request data, root path for metrics
 // and format (which also specifies submetrics)
 type IpmiCollector struct {
-	IpmiLayer   ipmi.IpmiAL
-	Vendor      map[string][]ipmi.RequestDescription
-	Hosts       []string
-	Mode        string
-	Initialized bool
-	NSim        int
-	Inventory   map[string]map[string]string
-	ComponentHealth      map[string]map[string]string
+	IpmiLayer       ipmi.IpmiAL
+	Vendor          map[string][]ipmi.RequestDescription
+	Hosts           []string
+	Mode            string
+	Initialized     bool
+	NSim            int
+	Inventory       map[string]map[string]string
+	ComponentHealth map[string]map[string]string
 }
+
 func init() {
 	f, err := os.OpenFile("/tmp/intel-dcm-platform-collector.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
@@ -141,14 +143,14 @@ func (ic *IpmiCollector) CollectMetrics(mts []plugin.MetricType) ([]plugin.Metri
 			var data interface{}
 			if strings.Contains(key, "inventory/") {
 				data = ic.Inventory[host][key]
-			}else if strings.Contains(key,"health/"){
+			} else if strings.Contains(key, "health/") {
 				sdrParser := &ipmi.SdrParser{}
 				sdrParser.IpmiLayer = ic.IpmiLayer
 				ic.ComponentHealth = make(map[string]map[string]string, len(ic.Hosts))
 				for _, host := range ic.Hosts {
 					health, _ := sdrParser.GetComponentHealth(host)
 					ic.ComponentHealth[host] = health
-				}				
+				}
 				data = ic.ComponentHealth[host][key]
 			} else {
 				data = responseCache[host][key]
@@ -170,7 +172,7 @@ func (ic *IpmiCollector) GetMetricTypes(cfg plugin.ConfigType) ([]plugin.MetricT
 	var config = cfg.Table()
 	log.Debug("get Config fun GetMetricTypes")
 	log.WithFields(log.Fields{
-		"mode": config["mode"].(ctypes.ConfigValueStr).Value,		
+		"mode": config["mode"].(ctypes.ConfigValueStr).Value,
 	}).Debug("GetMetricTypes")
 	ic.construct(cfg.Table())
 	var mts []plugin.MetricType
@@ -312,9 +314,8 @@ func (ic *IpmiCollector) construct(cfg map[string]ctypes.ConfigValue) {
 	for _, host := range ic.Hosts {
 		inventory, _ := parser.GetInventoryInfo(host)
 		ic.Inventory[host] = inventory
-	}	
+	}
 
 	ic.Initialized = true
 
 }
-
